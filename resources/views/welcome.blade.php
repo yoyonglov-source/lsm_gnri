@@ -28,9 +28,7 @@
     <div style="background-color: #C8102E;" class="text-white py-1.5 px-4 sm:px-8">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <!-- Text Slogan (Pakai style font-size murni) -->
-            <p style="font-size: 10px;" class="font-medium tracking-wide">
-                Persaudaraan Dalam Kesatuan Menjaga Keutuhan NKRI
-            </p>
+            
 
             <!-- Social Media Icons -->
             <div class="flex items-center gap-4 text-white/90">
