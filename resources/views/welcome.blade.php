@@ -151,7 +151,7 @@
                 <!-- Hero Background Image -->
                 <!-- object-bottom / object-[80%_100%] memastikan area bawah (orang-orang) & kanan (bendera) tidak terpotong -->
                 <img 
-                    src="{{ asset('build/assets/hero.webp') }}" 
+                    src="{{ asset('build/assets/hero.png') }}" 
                     alt="Hero GNRI" 
                     class="w-full h-full object-cover object-bottom lg:object-[80%_100%]"
                 >
