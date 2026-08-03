@@ -16,15 +16,15 @@ return new class extends Migration
             
             // Relasi ke User (Akun Login) dan Kabupaten (Wilayah DPD)
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('kabupaten_id')->constrained()->onDelete('restrict');
+            $table->foreignId('kabupaten_id')->nullable()->constrained()->onDelete('restrict');
             
-            // Biodata Fisik Anggota
-            $table->string('nik', 16)->unique();
-            $table->string('no_hp', 15);
-            $table->text('alamat');
-            $table->enum('jenis_kelamin', ['L', 'P']);
-            $table->string('tempat_lahir');
-            $table->date('tanggal_lahir');
+            // Biodata Fisik Anggota (Dibuat nullable agar register awal tidak error)
+            $table->string('nik')->nullable();
+            $table->string('no_hp', 15)->nullable();
+            $table->text('alamat')->nullable();
+            $table->enum('jenis_kelamin', ['L', 'P'])->nullable();
+            $table->string('tempat_lahir')->nullable();
+            $table->date('tanggal_lahir')->nullable();
             
             // Berkas Pendukung
             $table->string('pas_foto')->nullable(); // Menyimpan path file gambar

@@ -21,7 +21,7 @@ class RoleManager
         }
 
         $user = Auth::user();
-        $userRole = strtolower($user->role);
+        $userRole = strtolower($user->role ?? '');
 
         // Kumpulan semua role bertipe Admin
         $adminRoles = ['superadmin', 'super_admin', 'admin_dpw', 'admin_dpd', 'admin'];
@@ -40,17 +40,13 @@ class RoleManager
             return redirect()->route('dashboard')->with('error', 'Anda tidak memiliki akses ke halaman Admin.');
         }
 
-        // Jika Admin mencoba masuk ke halaman User biasa (/dashboard), langsung auto-redirect ke Admin Dashboard
-        if (in_array($userRole, $adminRoles) && !$request->is('admin*')) {
+        // JIKA ADMIN AKSES ROUTE USER BIASA (/dashboard):
+        // Kecualikan route 'profile*' agar Admin TETAP BISA edit profile akun mereka!
+        if (in_array($userRole, $adminRoles) && !$request->is('admin*') && !$request->is('profile*')) {
             return redirect()->route('admin.dashboard');
         }
 
-        // Jika user mempunyai akses sesuai kriteria di atas
-        if (empty($allowedRoles)) {
-            return $next($request);
-        }
-
-        // default fallback jika role tidak cocok sama sekali
-        abort(403, 'Anda tidak memiliki hak akses untuk halaman ini.');
+        // Jika route tidak membatasi role (empty $allowedRoles) ATAU halaman profile -> Loloskan
+        return $next($request);
     }
 }

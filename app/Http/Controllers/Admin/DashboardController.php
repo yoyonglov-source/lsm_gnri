@@ -14,6 +14,8 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
+    // 1. JIKA USER ADALAH ADMIN (DPW / DPD)
+    if (in_array($user->role, ['admin_dpw', 'admin_dpd'])) {
         $queryAnggota = Anggota::query();
 
         if ($user->role === 'admin_dpd' && $user->kabupaten_id) {
@@ -37,6 +39,18 @@ class DashboardController extends Controller
             'totalKabupaten',
             'pendaftarBaru'
         ));
+    }
+
+    // 2. JIKA USER ADALAH ANGGOTA BIASA (USER REGISTER)
+    $anggota = $user->anggota; // Relasi ke tabel anggotas
+
+    // Jika biodata belum diisi lengkap (misal NIK / No HP masih kosong), redirect langsung ke form isi profil!
+    if (!$anggota || !$anggota->nik || !$anggota->no_hp) {
+        return redirect()->route('profile.edit')->with('warning', 'Silakan lengkapi biodata Anda terlebih dahulu.');
+    }
+
+    // Jika sudah diisi lengkap, tampilkan dashboard anggota biasa
+    return view('dashboard', compact('user', 'anggota'));
     }
 
     public function verifikasiList()

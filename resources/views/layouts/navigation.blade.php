@@ -5,22 +5,18 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
+                    <a href="{{ in_array(strtolower(auth()->user()->role), ['admin', 'superadmin', 'admin_dpw', 'admin_dpd']) ? route('admin.dashboard') : route('dashboard') }}">
                         <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
                     </a>
                 </div>
 
                 <!-- Navigation Links (Desktop) -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <!-- Dashboard Utama (Berlaku untuk Semua) -->
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-
-                    <!-- MENU KHUSUS ADMIN (Superadmin, Admin DPW, Admin DPD, Admin) -->
+                    
+                    {{-- 1. MENU UNTUK ADMIN (Statistik Admin sebagai Utama) --}}
                     @if(in_array(strtolower(auth()->user()->role), ['admin', 'superadmin', 'admin_dpw', 'admin_dpd']))
                         <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
-                            {{ __('Dashboard Admin') }}
+                            {{ __('Dashboard') }}
                         </x-nav-link>
 
                         <x-nav-link :href="route('admin.anggota.index')" :active="request()->routeIs('admin.anggota.*')">
@@ -34,7 +30,19 @@
                         <x-nav-link :href="route('admin.kabupaten.index')" :active="request()->routeIs('admin.kabupaten.*')">
                             {{ __('Data Kabupaten') }}
                         </x-nav-link>
+
+                    {{-- 2. MENU UNTUK USER BIASA / ANGGOTA --}}
+                    @else
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
                     @endif
+
+                    {{-- 3. MENU PROFILE ANGGOTA (Dapat diakses semua pengguna) --}}
+                    <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
+                        {{ __('Profile Saya') }}
+                    </x-nav-link>
+
                 </div>
             </div>
 
@@ -87,18 +95,10 @@
     <!-- Responsive Navigation Menu (Mobile View) -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-
-            <!-- MENU KHUSUS ADMIN (MOBILE) -->
+            
             @if(in_array(strtolower(auth()->user()->role), ['admin', 'superadmin', 'admin_dpw', 'admin_dpd']))
-                <div class="pt-2 pb-1 border-t border-gray-200">
-                    <div class="px-4 text-xs font-semibold text-gray-400 uppercase">Manajemen LSM</div>
-                </div>
-
                 <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
-                    {{ __('Dashboard Admin') }}
+                    {{ __('Dashboard') }}
                 </x-responsive-nav-link>
 
                 <x-responsive-nav-link :href="route('admin.anggota.index')" :active="request()->routeIs('admin.anggota.*')">
@@ -112,7 +112,15 @@
                 <x-responsive-nav-link :href="route('admin.kabupaten.index')" :active="request()->routeIs('admin.kabupaten.*')">
                     {{ __('Data Kabupaten') }}
                 </x-responsive-nav-link>
+            @else
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    {{ __('Dashboard') }}
+                </x-responsive-nav-link>
             @endif
+
+            <x-responsive-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
+                {{ __('Profile Saya') }}
+            </x-responsive-nav-link>
         </div>
 
         <!-- Responsive Settings Options -->

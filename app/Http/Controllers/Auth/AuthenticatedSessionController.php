@@ -25,32 +25,19 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        // 1. Cek dulu apakah user ada dan status anggotanya non-aktif (SEBELUM login)
-        $user = \App\Models\User::where('email', $request->email)->first();
-
-        if ($user && $user->anggota && ! $user->anggota->is_active) {
-            throw ValidationException::withMessages([
-                'email' => 'Akun Anda telah dinonaktifkan oleh Admin. Silakan hubungi pengurus.',
-            ]);
-        }
-
-        // 2. Jika user aktif (atau user belum terdaftar/salah email), jalankan otentikasi Breeze normal
         $request->authenticate();
 
-        // 3. Regenerasi session untuk user yang lolos login
         $request->session()->regenerate();
 
-        // Ambil data user yang sedang login
         $user = Auth::user();
-        $userRole = strtolower($user->role);
-        $adminRoles = ['super_admin', 'admin_dpd', 'admin_dpw', 'admin'];
 
-        // 4. Logic Redirect Berdasarkan Role (Case-Insensitive)
-        if (in_array($userRole, $adminRoles)) {
+        // JIKA YANG LOGIN ADALAH ADMIN -> LANGSUNG LEMPAR KE /admin/dashboard
+        if (in_array($user->role, ['admin', 'superadmin', 'admin_dpw', 'admin_dpd'])) {
             return redirect()->route('admin.dashboard');
         }
 
-        return redirect()->route('dashboard');
+        // JIKA USER / ANGGOTA BIASA -> LEMPAR KE /dashboard
+        return redirect()->intended(route('dashboard'));
     }
     /**
      * Destroy an authenticated session.

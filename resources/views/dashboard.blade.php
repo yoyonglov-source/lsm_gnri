@@ -17,7 +17,7 @@
             </div>
         @endif
 
-        @if(!$anggota)
+        @if(!$anggota || !$anggota->nik || !$anggota->no_hp)
             <!-- ================= FORM PENDAFTARAN BIODATA ANGGOTA ================= -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
                 <div class="p-4 sm:p-6 bg-slate-50 border-b border-slate-200/80">
@@ -119,7 +119,7 @@
                 <div class="flex-1 text-center md:text-left space-y-2 w-full">
                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Status Verifikasi Berkas</span>
                     <h3 class="text-xl sm:text-2xl font-black text-slate-800">{{ $user->name }}</h3>
-                    <p class="text-xs sm:text-sm text-slate-500">DPD Pendataan: <span class="font-semibold text-slate-700">{{ $anggota->kabupaten->nama_kabupaten }}</span></p>
+                    <p class="text-xs sm:text-sm text-slate-500">DPD Pendataan: <span class="font-semibold text-slate-700">{{ $anggota->kabupaten?->nama_kabupaten ?? 'Belum Diisi' }}</span></p>
                     
                     <div class="pt-2 flex flex-col items-center md:items-start">
                         @if($anggota->status_verifikasi === 'pending')
