@@ -70,89 +70,87 @@
 </div>
 
     <!-- Container Utama Kartu KTA -->
-    <div class="flex flex-col md:flex-row gap-8 items-center justify-center">
+<div class="flex flex-col md:flex-row gap-8 items-center justify-center">
 
-        <!-- ================= TAMPAK DEPAN ================= -->
-        <div class="kta-card w-[80mm] h-[132mm] bg-white rounded-xl overflow-hidden shadow-2xl border border-slate-400 relative flex flex-col justify-between select-none">
+    <!-- ================= TAMPAK DEPAN ================= -->
+    <div class="kta-card w-[80mm] h-[132mm] bg-white rounded-xl overflow-hidden shadow-2xl border border-slate-400 relative flex flex-col justify-between select-none">
+        
+        <!-- HEADER HITAM DEPAN (48% Tinggi Kartu) -->
+        <div class="bg-black text-yellow-400 p-2 text-center relative h-[48%] flex flex-col justify-between border-b-2 border-yellow-500 overflow-visible">
             
-            <!-- HEADER HITAM DEPAN (48% Tinggi Kartu) -->
-            <div class="bg-black text-yellow-400 p-2 text-center relative h-[48%] flex flex-col justify-between border-b-2 border-yellow-500 overflow-visible">
+            <!-- Flexbox Logo Kiri - Judul - Logo Kanan -->
+            <div class="flex items-center justify-between gap-1 w-full pt-4">
                 
-                <!-- Flexbox Logo Kiri - Judul - Logo Kanan -->
-                <div class="flex items-center justify-between gap-1 w-full pt-4">
-                    
-                    <!-- Logo Kiri -->
-                    <div class="w-[80px] h-[80px] flex-shrink-0 flex items-center justify-center">
-                        <img src="{{ asset('storage/logo_kiri.png') }}" alt="Logo Kiri" class="max-w-full max-h-full object-contain">
-                    </div>
-
-                    <!-- Judul Header -->
-                    <div class="flex-1 text-center">
-                        <p class="text-[9.5px] font-black tracking-wider text-yellow-400 uppercase leading-none">KARTU TANDA ANGGOTA</p>
-                        <h1 class="text-xl font-black text-yellow-400 tracking-tight leading-none my-0.5">LSM GNRI</h1>
-                        <p class="text-[7.5px] font-black text-yellow-400 leading-tight uppercase tracking-tight">
-                            LEMBAGA SWADAYA MASYARAKAT<br>GERAKAN NAWACITA RAKYAT INDONESIA
-                        </p>
-                    </div>
-
-                    <!-- Logo Kanan -->
-                    <div class="w-[80px] h-[80px] flex-shrink-0 flex items-center justify-center">
-                        <img src="{{ asset('storage/logo_kanan.png') }}" alt="Logo Kanan" class="max-w-full max-h-full object-contain">
-                    </div>
-
+                <!-- Logo Kiri -->
+                <div class="w-[80px] h-[80px] flex-shrink-0 flex items-center justify-center">
+                    <img src="{{ asset('storage/logo_kiri.png') }}" alt="Logo Kiri" class="max-w-full max-h-full object-contain">
                 </div>
 
-                <!-- Pas Foto (Posisi nangkring di perbatasan header hitam & area putih) -->
-                <div class="w-[44mm] h-[54mm] bg-slate-200 border-2 border-white shadow-md overflow-hidden self-center bg-cover bg-center flex-shrink-0 -mb-16 transform translate-y-2 z-20">
-                    @if($anggota->pas_foto)
-                        <img src="{{ asset('storage/' . $anggota->pas_foto) }}" class="w-full h-full object-cover object-top filter brightness-105 contrast-105">
-                    @else
-                        <div class="w-full h-full flex items-center justify-center text-xs text-slate-400 font-bold">NO FOTO</div>
-                    @endif
+                <!-- Judul Header -->
+                <div class="flex-1 text-center">
+                    <p class="text-[9.5px] font-black tracking-wider text-yellow-400 uppercase leading-none">KARTU TANDA ANGGOTA</p>
+                    <h1 class="text-xl font-black text-yellow-400 tracking-tight leading-none my-0.5">LSM GNRI</h1>
+                    <p class="text-[7.5px] font-black text-yellow-400 leading-tight uppercase tracking-tight">
+                        LEMBAGA SWADAYA MASYARAKAT<br>GERAKAN NAWACITA RAKYAT INDONESIA
+                    </p>
+                </div>
+
+                <!-- Logo Kanan -->
+                <div class="w-[80px] h-[80px] flex-shrink-0 flex items-center justify-center">
+                    <img src="{{ asset('storage/logo_kanan.png') }}" alt="Logo Kanan" class="max-w-full max-h-full object-contain">
                 </div>
 
             </div>
 
-            <!-- IDENTITAS ANGGOTA (Area Putih Tengah) -->
-            <div class="pt-16 pb-2 px-3 text-center flex-1 flex flex-col justify-center items-center">
+            <!-- Pas Foto (Posisi nangkring di perbatasan header hitam & area putih) -->
+            <div class="w-[44mm] h-[54mm] bg-slate-200 border-2 border-white shadow-md overflow-hidden self-center bg-cover bg-center flex-shrink-0 -mb-16 transform translate-y-2 z-20">
+                @if($anggota->pas_foto)
+                    <img src="{{ asset('storage/' . $anggota->pas_foto) }}" class="w-full h-full object-cover object-top filter brightness-105 contrast-105">
+                @else
+                    <div class="w-full h-full flex items-center justify-center text-xs text-slate-400 font-bold">NO FOTO</div>
+                @endif
+            </div>
 
-                <!-- JABATAN & STRUKTUR WILAYAH -->
-                <div class="mb-1">
-                    @php
-                        $jabatanRaw = strtoupper(trim($anggota->jabatan ?? 'ANGGOTA'));
-                        $isAnggotaBiasa = ($jabatanRaw === 'ANGGOTA' || empty($jabatanRaw));
-                        $namaWilayah = strtoupper($anggota->kabupaten->nama_kabupaten ?? $anggota->kabupaten->name ?? 'RIAU');
-                    @endphp
+        </div>
 
-                    @if($isAnggotaBiasa)
-                        <p class="text-[10px] font-black text-red-600 uppercase tracking-tight leading-tight">
-                            ANGGOTA
-                        </p>
-                        <p class="text-[9px] font-black text-red-600 uppercase tracking-tight leading-tight">
-                            WILAYAH {{ $namaWilayah }}
-                        </p>
-                    @else
-                        <p class="text-[10px] font-black text-red-600 uppercase tracking-tight leading-tight">
-                            {{ $jabatanRaw }}
-                        </p>
-                        <p class="text-[9px] font-black text-red-600 uppercase tracking-tight leading-tight">
-                            DEWAN PIMPINAN WILAYAH {{ $namaWilayah }}
-                        </p>
-                    @endif
-                </div>
+            <!-- IDENTITAS ANGGOTA (Area Putih Bawah) -->
+        <!-- Memakai inline style padding-top & margin-top agar pasti kebaca oleh browser live tanpa tergantung build CSS -->
+        <div style="padding-top: 5rem; padding-bottom: 0.5rem;" class="px-3 text-center flex-1 flex flex-col justify-center items-center">
 
-                <!-- NAMA ANGGOTA -->
-                <h2 class="text-lg font-black text-black uppercase tracking-wide leading-tight">
-                    {{ $anggota->user->name }}
-                </h2>
+            <!-- JABATAN & STRUKTUR WILAYAH -->
+            <div style="margin-top: 0.5rem; margin-bottom: 0.25rem;">
+                @php
+                    $jabatanRaw = strtoupper(trim($anggota->jabatan ?? 'ANGGOTA'));
+                    $namaWilayah = strtoupper($anggota->kabupaten->nama_kabupaten ?? '');
+                    
+                    // Cek apakah wilayah yang dipilih adalah DPW Riau
+                    $isDPW = str_contains($namaWilayah, 'WILAYAH') || str_contains($namaWilayah, 'DPW');
+                @endphp
 
-                <!-- NOMOR KTA -->
-                <p class="text-xs font-mono font-black text-black tracking-wider mt-0.5">
-                    {{ $anggota->no_kta ?? '002.001.0761.0261.02021986' }}
+                <!-- Teks Jabatan Spesifik / Anggota -->
+                <p class="text-[10px] font-black text-red-600 uppercase tracking-tight leading-tight">
+                    {{ $jabatanRaw }}
                 </p>
 
+                @if($isDPW)
+                    <!-- Tampilan jika pilih DPW Riau -->
+                    <p class="text-[9px] font-black text-red-600 uppercase tracking-tight leading-tight">
+                        DEWAN PIMPINAN WILAYAH RIAU
+                    </p>
+                @else
+                    <!-- Tampilan jika pilih Kabupaten / Kota (DPD) -->
+                    <p class="text-[9px] font-black text-red-600 uppercase tracking-tight leading-tight">
+                        DEWAN PIMPINAN DAERAH {{ $namaWilayah }}
+                    </p>
+                @endif
             </div>
-        
+
+            <!-- NAMA & NO KTA -->
+            <h3 class="text-xs font-black text-slate-800 uppercase tracking-wide mt-1">{{ $anggota->user->name ?? 'BELVA' }}</h3>
+            <p class="text-[10px] font-mono font-bold text-slate-700 tracking-wider">{{ $anggota->no_kta ?? '009.010.011' }}</p>
+
+        </div>
+          
             <!-- FOOTER DEPAN -->
             <div class="p-2.5 bg-white border-t border-slate-300 flex items-center justify-between gap-1.5">
                 <div class="w-[68%] text-black font-extrabold leading-tight text-left">

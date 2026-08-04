@@ -8,7 +8,7 @@
                 <div class="space-y-3">
                     <div class="flex items-center gap-3">
                         <!-- Ganti src logo sesuai asset kamu -->
-                        <img src="{{ asset('storage/logo_kiri.png') }}" alt="Logo GNRI" style="height: 120px;" class="w-auto object-contain">
+                        <img src="{{ asset('storage/logo_kiri.png') }}" alt="Logo GNRI" style="height: 100px;" class="w-auto object-contain">
                         <div>
                             <h3 class="font-extrabold text-base tracking-wider leading-tight">GNRI</h3>
                             <p class="text-[10px] font-semibold tracking-tight text-white/90 leading-none mt-0.5">

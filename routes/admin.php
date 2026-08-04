@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\AnggotaController;
 use App\Http\Controllers\Admin\KabupatenController;
+use App\Http\Controllers\Admin\BeritaController;
 
 // Lindungi SEMUA route admin dengan Auth dan Role Admin/Superadmin/Admin DPW
 Route::middleware(['auth', 'role:admin,superadmin,admin_dpw,admin_dpd'])->prefix('admin')->name('admin.')->group(function () {
@@ -28,5 +29,9 @@ Route::middleware(['auth', 'role:admin,superadmin,admin_dpw,admin_dpd'])->prefix
     // Manajemen Kabupaten / Sekretariat
     Route::get('/kabupaten', [KabupatenController::class, 'index'])->name('kabupaten.index');
     Route::put('/kabupaten/{kabupaten}', [KabupatenController::class, 'update'])->name('kabupaten.update');
+
+    Route::resource('berita', BeritaController::class)->parameters([
+    'berita' => 'berita'
+]);
 
 });

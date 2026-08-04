@@ -66,7 +66,7 @@
         <!-- CARD GRID ANGGOTA -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             
-            <!-- 1. KARTU DOTTED: TAMBAH ANGGOTA BARU (Persis Gambar Referensi) -->
+            <!-- 1. KARTU DOTTED: TAMBAH ANGGOTA BARU -->
             <a href="{{ route('admin.anggota.create') }}" class="border-2 border-dashed border-emerald-300/80 bg-emerald-50/40 hover:bg-emerald-50 hover:border-emerald-500 rounded-2xl p-6 flex flex-col items-center justify-center text-center transition group min-h-[260px]">
                 <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,7 +80,8 @@
             <!-- 2. LOOP KARTU ANGGOTA -->
             @forelse($anggotas as $item)
                 @php
-                    $hp = preg_replace('/[^0-9]/', '', $item->no_hp);
+                    $hpRaw = $item->no_hp ?? '';
+                    $hp = preg_replace('/[^0-9]/', '', $hpRaw);
                     if (str_starts_with($hp, '0')) {
                         $hp = '62' . substr($hp, 1);
                     }
@@ -109,9 +110,9 @@
                                 </button>
                             </form>
                             
-                            <!-- Badge DPD -->
+                            <!-- Badge DPD (SAFE CHECK) -->
                             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-100 px-2 py-0.5 rounded-md">
-                                {{ $item->kabupaten->nama_kabupaten }}
+                                {{ $item->kabupaten->nama_kabupaten ?? 'DPD -' }}
                             </span>
                         </div>
                     </div>
@@ -119,36 +120,52 @@
                     <!-- Middle Card: Information Data Anggota -->
                     <div class="p-4 flex-1 flex flex-col justify-between">
                         <div>
-                            <span class="inline-block px-2 py-0.5 bg-emerald-50 text-emerald-700 font-mono font-bold text-[11px] rounded-md mb-1.5 border border-emerald-100">
-                                {{ $item->no_kta ?? 'Belum Terbit' }}
-                            </span>
-                            <h3 class="font-bold text-slate-800 text-sm leading-snug line-clamp-1" title="{{ $item->user->name }}">
-                                {{ $item->user->name }}
+                            @if($item->no_kta)
+                                <span class="inline-block px-2 py-0.5 bg-emerald-50 text-emerald-700 font-mono font-bold text-[11px] rounded-md mb-1.5 border border-emerald-100">
+                                    {{ $item->no_kta }}
+                                </span>
+                            @else
+                                <span class="inline-block px-2 py-0.5 bg-amber-50 text-amber-600 font-mono font-bold text-[11px] rounded-md mb-1.5 border border-amber-200">
+                                    Belum Terbit
+                                </span>
+                            @endif
+
+                            <h3 class="font-bold text-slate-800 text-sm leading-snug line-clamp-1" title="{{ $item->user->name ?? 'Tanpa Nama' }}">
+                                {{ $item->user->name ?? 'Tanpa Nama' }}
                             </h3>
-                            <p class="text-[11px] text-slate-400 font-mono mt-0.5">NIK: {{ $item->nik }}</p>
+                            <p class="text-[11px] text-slate-400 font-mono mt-0.5">NIK: {{ $item->nik ?? '-' }}</p>
                         </div>
 
                         <!-- Quick Contact Button -->
                         <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                            <a href="https://wa.me/{{ $hp }}" target="_blank" class="inline-flex items-center gap-1.5 text-slate-600 hover:text-emerald-600 font-medium transition text-[11px]">
-                                <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/>
-                                </svg>
-                                <span>{{ $item->no_hp }}</span>
-                            </a>
-                            
+                            @if(!empty($hp))
+                                <a href="https://wa.me/{{ $hp }}" target="_blank" class="inline-flex items-center gap-1.5 text-slate-600 hover:text-emerald-600 font-medium transition text-[11px]">
+                                    <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/>
+                                    </svg>
+                                    <span>{{ $item->no_hp }}</span>
+                                </a>
+                            @else
+                                <span class="text-[11px] text-slate-400 font-medium">-</span>
+                            @endif
                         </div>
                     </div>
 
                     <!-- Bottom Action Bar (Cetak KTA, Detail & Edit Pencil) -->
                     <div class="px-4 py-2 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold">
                         <!-- Kiri: Cetak KTA -->
-                        <a href="{{ route('admin.kta.cetak', $item->id) }}" target="_blank" class="text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
-                            </svg>
-                            <span>Cetak KTA</span>
-                        </a>
+                        @if($item->no_kta)
+                            <a href="{{ route('admin.kta.cetak', $item->id) }}" target="_blank" class="text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
+                                </svg>
+                                <span>Cetak KTA</span>
+                            </a>
+                        @else
+                            <span class="text-slate-400 flex items-center gap-1 cursor-not-allowed" title="KTA belum terbit">
+                                <span>KTA Pending</span>
+                            </span>
+                        @endif
 
                         <!-- Kanan: Detail & Icon Pencil Edit -->
                         <div class="flex items-center gap-2">
@@ -227,8 +244,8 @@
                             <div>
                                 <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider block">No. KTA Resmi</span>
                                 <p class="text-lg font-mono font-black text-slate-800" x-text="selectedAnggota.no_kta || 'BELUM TERBIT'"></p>
-                                <p class="text-xs font-bold text-slate-700 mt-0.5" x-text="selectedAnggota.user.name"></p>
-                                <p class="text-xs text-slate-500" x-text="selectedAnggota.user.email"></p>
+                                <p class="text-xs font-bold text-slate-700 mt-0.5" x-text="selectedAnggota.user ? selectedAnggota.user.name : '-'"></p>
+                                <p class="text-xs text-slate-500" x-text="selectedAnggota.user ? selectedAnggota.user.email : '-'"></p>
                             </div>
                         </div>
 
@@ -236,29 +253,29 @@
                         <div class="grid grid-cols-2 gap-3 text-xs">
                             <div class="p-3 bg-slate-50/70 rounded-xl border border-slate-100">
                                 <p class="text-[10px] font-bold text-slate-400 uppercase">NIK</p>
-                                <p class="font-mono font-semibold text-slate-800 mt-0.5" x-text="selectedAnggota.nik"></p>
+                                <p class="font-mono font-semibold text-slate-800 mt-0.5" x-text="selectedAnggota.nik || '-'"></p>
                             </div>
                             <div class="p-3 bg-slate-50/70 rounded-xl border border-slate-100">
                                 <p class="text-[10px] font-bold text-slate-400 uppercase">Wilayah DPD</p>
-                                <p class="font-semibold text-slate-800 mt-0.5" x-text="selectedAnggota.kabupaten.nama_kabupaten"></p>
+                                <p class="font-semibold text-slate-800 mt-0.5" x-text="selectedAnggota.kabupaten ? selectedAnggota.kabupaten.nama_kabupaten : '-'"></p>
                             </div>
                             <div class="p-3 bg-slate-50/70 rounded-xl border border-slate-100">
                                 <p class="text-[10px] font-bold text-slate-400 uppercase">Tempat, Tgl Lahir</p>
                                 <p class="font-semibold text-slate-800 mt-0.5">
-                                    <span x-text="selectedAnggota.tempat_lahir"></span>, 
-                                    <span x-text="selectedAnggota.tanggal_lahir"></span>
+                                    <span x-text="selectedAnggota.tempat_lahir || '-'"></span>, 
+                                    <span x-text="selectedAnggota.tanggal_lahir || '-'"></span>
                                 </p>
                             </div>
                             <div class="p-3 bg-slate-50/70 rounded-xl border border-slate-100">
                                 <p class="text-[10px] font-bold text-slate-400 uppercase">Jenis Kelamin</p>
-                                <p class="font-semibold text-slate-800 mt-0.5" x-text="selectedAnggota.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan'"></p>
+                                <p class="font-semibold text-slate-800 mt-0.5" x-text="selectedAnggota.jenis_kelamin === 'L' ? 'Laki-laki' : (selectedAnggota.jenis_kelamin === 'P' ? 'Perempuan' : '-')"></p>
                             </div>
                         </div>
 
                         <!-- Alamat Lengkap -->
                         <div class="p-3 bg-slate-50/70 rounded-xl border border-slate-100 text-xs">
                             <p class="text-[10px] font-bold text-slate-400 uppercase">Alamat Rumah</p>
-                            <p class="font-semibold text-slate-800 mt-0.5" x-text="selectedAnggota.alamat"></p>
+                            <p class="font-semibold text-slate-800 mt-0.5" x-text="selectedAnggota.alamat || '-'"></p>
                         </div>
                     </div>
                 </template>

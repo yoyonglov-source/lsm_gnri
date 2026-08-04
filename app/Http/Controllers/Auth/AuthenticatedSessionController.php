@@ -31,12 +31,23 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
-        // JIKA YANG LOGIN ADALAH ADMIN -> LANGSUNG LEMPAR KE /admin/dashboard
-        if (in_array($user->role, ['admin', 'superadmin', 'admin_dpw', 'admin_dpd'])) {
+        // Normalisasi role agar "admin", "Admin", "ADMIN" dianggap sama
+        $userRole = strtolower(trim($user->role ?? ''));
+
+        // Role yang dianggap sebagai Admin
+        $adminRoles = [
+            'admin',
+            'superadmin',
+            'admin_dpw',
+            'admin_dpd',
+        ];
+
+        // Jika yang login adalah Admin -> langsung ke Dashboard Admin
+        if (in_array($userRole, $adminRoles)) {
             return redirect()->route('admin.dashboard');
         }
 
-        // JIKA USER / ANGGOTA BIASA -> LEMPAR KE /dashboard
+        // Jika User / Anggota biasa -> ke Dashboard Anggota
         return redirect()->intended(route('dashboard'));
     }
     /**

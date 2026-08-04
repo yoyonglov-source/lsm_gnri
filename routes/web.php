@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\KtaVerificationController;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\BeritaPublicController;
+
 
 Route::get('/storage/pas_foto/{filename}', function ($filename) {
     $path = storage_path('app/public/pas_foto/' . $filename);
@@ -26,6 +28,8 @@ Route::get('/', function () {
 });
 Route::get('/cek-keanggotaan', [KtaVerificationController::class, 'search'])->name('cek-keanggotaan.search');
 Route::get('/verify-kta/{no_kta}', [KtaVerificationController::class, 'verify'])->name('kta.verify');
+Route::get('/berita', [BeritaPublicController::class, 'index'])->name('berita.index');
+Route::get('/berita/{slug}', [BeritaPublicController::class, 'show'])->name('berita.show');
 
 // 2. RUTE KHUSUS USER UMUM / ANGGOTA BIASA (Sudah Login)
 Route::middleware(['auth', 'verified', 'role:user,anggota,admin,superadmin,admin_dpw,admin_dpd'])->group(function () {

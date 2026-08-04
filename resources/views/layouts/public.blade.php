@@ -1,20 +1,3 @@
-<!-- TOP BAR (BAR MERAH ATAS) -->
-<div class="bg-[#C8102E] text-white py-1.5 px-4 sm:px-8">
-    <div class="max-w-7xl mx-auto flex justify-between items-center">
-        <!-- Text Slogan (Dikecilkan) -->
-        <p class="text-[10px] font-medium tracking-wide">
-            Persaudaraan Dalam Kesatuan Menjaga Keutuhan NKRI
-        </p>
-
-        <!-- Social Media Icons Kanan -->
-        <div class="flex items-center gap-4 text-white/90">
-            <a href="#" class="hover:text-white transition"><i class="fab fa-facebook-f text-xs"></i></a>
-            <a href="#" class="hover:text-white transition"><i class="fab fa-instagram text-xs"></i></a>
-            <a href="#" class="hover:text-white transition"><i class="fab fa-youtube text-xs"></i></a>
-            <a href="#" class="hover:text-white transition"><i class="fas fa-envelope text-xs"></i></a>
-        </div>
-    </div>
-</div>
 
 <!-- MAIN NAVBAR -->
 <header class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm" x-data="{ openMobile: false }">

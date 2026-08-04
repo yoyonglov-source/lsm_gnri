@@ -14,43 +14,65 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-    // 1. JIKA USER ADALAH ADMIN (DPW / DPD)
-    if (in_array($user->role, ['admin_dpw', 'admin_dpd'])) {
-        $queryAnggota = Anggota::query();
+        $userRole = strtolower(trim($user->role ?? ''));
 
-        if ($user->role === 'admin_dpd' && $user->kabupaten_id) {
-            $queryAnggota->where('kabupaten_id', $user->kabupaten_id);
+        // ADMIN / SUPERADMIN / ADMIN DPW / ADMIN DPD
+        if (in_array($userRole, [
+            'admin',
+            'superadmin',
+            'admin_dpw',
+            'admin_dpd'
+        ])) {
+
+            $queryAnggota = Anggota::query();
+
+            if ($userRole === 'admin_dpd' && $user->kabupaten_id) {
+                $queryAnggota->where(
+                    'kabupaten_id',
+                    $user->kabupaten_id
+                );
+            }
+
+            $totalAnggota = (clone $queryAnggota)
+                ->where('status_verifikasi', 'disetujui')
+                ->count();
+
+            $menungguPersetujuan = (clone $queryAnggota)
+                ->where('status_verifikasi', 'pending')
+                ->count();
+
+            $totalKabupaten = Kabupaten::count();
+
+            $pendaftarBaru = (clone $queryAnggota)
+                ->where('status_verifikasi', 'pending')
+                ->latest()
+                ->take(5)
+                ->get();
+
+            return view('admin.dashboard', compact(
+                'totalAnggota',
+                'menungguPersetujuan',
+                'totalKabupaten',
+                'pendaftarBaru'
+            ));
         }
 
-        $totalAnggota = (clone $queryAnggota)->where('status_verifikasi', 'disetujui')->count();
-        $menungguPersetujuan = (clone $queryAnggota)->where('status_verifikasi', 'pending')->count();
-        $totalKabupaten = Kabupaten::count();
+        // USER / ANGGOTA BIASA
+        $anggota = $user->anggota;
 
-        // Ambil 5 pendaftar pending terbaru
-        $pendaftarBaru = (clone $queryAnggota)
-                            ->where('status_verifikasi', 'pending')
-                            ->latest()
-                            ->take(5)
-                            ->get();
+        if (!$anggota || !$anggota->nik || !$anggota->no_hp) {
+            return redirect()
+                ->route('profile.edit')
+                ->with(
+                    'warning',
+                    'Silakan lengkapi biodata Anda terlebih dahulu.'
+                );
+        }
 
-        return view('admin.dashboard', compact(
-            'totalAnggota', 
-            'menungguPersetujuan', 
-            'totalKabupaten',
-            'pendaftarBaru'
+        return view('dashboard', compact(
+            'user',
+            'anggota'
         ));
-    }
-
-    // 2. JIKA USER ADALAH ANGGOTA BIASA (USER REGISTER)
-    $anggota = $user->anggota; // Relasi ke tabel anggotas
-
-    // Jika biodata belum diisi lengkap (misal NIK / No HP masih kosong), redirect langsung ke form isi profil!
-    if (!$anggota || !$anggota->nik || !$anggota->no_hp) {
-        return redirect()->route('profile.edit')->with('warning', 'Silakan lengkapi biodata Anda terlebih dahulu.');
-    }
-
-    // Jika sudah diisi lengkap, tampilkan dashboard anggota biasa
-    return view('dashboard', compact('user', 'anggota'));
     }
 
     public function verifikasiList()
@@ -72,39 +94,40 @@ class DashboardController extends Controller
     /**
      * Memproses persetujuan atau penolakan anggota
      */
-    public function verifikasiProses($id, $status)
+    public function verifikasiProses(Request $request, $id, $status)
     {
-        // 1. Validasi parameter status yang diizinkan
-        if (!in_array($status, ['disetujui', 'ditolak'])) {
-            return redirect()->back()->with('error', 'Aksi tidak valid.');
-        }
+        $anggota = \App\Models\Anggota::findOrFail($id);
 
-        $user = Auth::user();
-        $anggota = Anggota::findOrFail($id);
-
-        // 2. Keamanan Tambahan: Pastikan admin DPD tidak memverifikasi dari luar wilayahnya
-        if ($user->role === 'admin_dpd' && $user->kabupaten_id !== $anggota->kabupaten_id) {
-            abort(403, 'Anda tidak memiliki hak akses untuk memverifikasi anggota di luar wilayah tugas Anda.');
-        }
-
-        // 3. Update status verifikasi
-        $anggota->status_verifikasi = $status;
-
-        // 4. JIKA DISETUJUI & BELUM PUNYA KTA -> GENERATE NOMOR KTA OTOMATIS
-        if ($status === 'disetujui' && empty($anggota->no_kta)) {
-            $kodeKabupaten = $anggota->kabupaten_id ? sprintf('%02d', $anggota->kabupaten_id) : '00';
-            $tahun = date('Y');
-            $random = sprintf('%03d', rand(1, 999));
+        // Mencegah error jika status yang dikirim 'disetujui' atau 'approved'
+        if (in_array(strtolower($status), ['disetujui', 'approved', 'approve'])) {
             
-            $anggota->no_kta = "GNRI-{$kodeKabupaten}-{$tahun}-{$random}";
+            // Validasi No. KTA
+            $request->validate([
+                'no_kta' => 'required|string|max:50|unique:anggotas,no_kta,' . $id,
+            ], [
+                'no_kta.required' => 'Nomor KTA wajib diisi.',
+                'no_kta.unique'   => 'Nomor KTA ini sudah terpakai.',
+            ]);
+
+            // Simpan ke DB (Pastikan status_verifikasi bernilai 'disetujui')
+            $anggota->update([
+                'no_kta'            => $request->no_kta,
+                'status_verifikasi' => 'disetujui',
+                'is_active'         => 1,
+            ]);
+
+            return redirect()->route('admin.verifikasi.index')->with('success', "Anggota {$anggota->user->name} berhasil disetujui!");
+
+        } elseif (in_array(strtolower($status), ['ditolak', 'rejected', 'reject'])) {
+            
+            $anggota->update([
+                'status_verifikasi' => 'ditolak',
+                'is_active'         => 0,
+            ]);
+
+            return redirect()->route('admin.verifikasi.index')->with('success', "Pendaftaran ditolak.");
         }
 
-        $anggota->save();
-
-        $pesan = $status === 'disetujui' 
-            ? 'Anggota berhasil disetujui dan Nomor KTA telah diterbitkan!' 
-            : 'Pendaftaran anggota telah ditolak.';
-
-        return redirect()->route('admin.verifikasi.index')->with('success', $pesan);
+        return redirect()->back()->with('error', 'Aksi tidak valid.');
     }
 }

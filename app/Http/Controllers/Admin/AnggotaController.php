@@ -79,7 +79,7 @@ class AnggotaController extends Controller
     }
 
     /**
-     * Simpan Data Anggota Baru
+     * Simpan Data Anggota Baru (INPUT NO KTA MANUAL)
      */
     public function store(Request $request)
     {
@@ -88,6 +88,7 @@ class AnggotaController extends Controller
             'email'         => 'required|string|email|max:255|unique:users',
             'password'      => 'required|string|min:8',
             'nik'           => 'required|string|size:16|unique:anggotas,nik',
+            'no_kta'        => 'required|string|max:50|unique:anggotas,no_kta', // FIX: Validasi No KTA Manual Unik
             'no_hp'         => 'required|string|max:20',
             'tempat_lahir'  => 'required|string|max:100',
             'tanggal_lahir' => 'required|date',
@@ -104,7 +105,7 @@ class AnggotaController extends Controller
             'email'        => $request->email,
             'password'     => Hash::make($request->password),
             'role'         => 'user',
-            'kabupaten_id' => $request->kabupaten_id, // FIX: simpan ke tabel users
+            'kabupaten_id' => $request->kabupaten_id,
         ]);
 
         // 2. Upload, Crop 3:4 & Compress Pas Foto
@@ -113,26 +114,23 @@ class AnggotaController extends Controller
             $pasFotoPath = $this->cropAndCompressImage($request->file('pas_foto'), 'pas_foto');
         }
 
-        // 3. Generate No KTA
-        $noKta = 'GNRI.' . date('Ym') . '.' . sprintf('%04d', $user->id);
-
-        // 4. Buat Profile Anggota
+        // 3. Buat Profile Anggota menggunakan No KTA yang Diinputkan Manual
         Anggota::create([
-            'user_id'       => $user->id,
-            'nik'           => $request->nik,
-            'no_kta'        => $noKta,
-            'no_hp'         => $request->no_hp,
-            'tempat_lahir'  => $request->tempat_lahir,
-            'tanggal_lahir' => $request->tanggal_lahir,
-            'jenis_kelamin' => $request->jenis_kelamin,
-            'alamat'        => $request->alamat,
-            'kabupaten_id'  => $request->kabupaten_id,
-            'jabatan'       => $request->jabatan ?? 'ANGGOTA',
+            'user_id'           => $user->id,
+            'nik'               => $request->nik,
+            'no_kta'            => $request->no_kta, // FIX: Menggunakan inputan manual
+            'no_hp'             => $request->no_hp,
+            'tempat_lahir'      => $request->tempat_lahir,
+            'tanggal_lahir'     => $request->tanggal_lahir,
+            'jenis_kelamin'     => $request->jenis_kelamin,
+            'alamat'            => $request->alamat,
+            'kabupaten_id'      => $request->kabupaten_id,
+            'jabatan'           => $request->jabatan ?? 'ANGGOTA',
             'status_verifikasi' => 'disetujui',
-            'pas_foto'      => $pasFotoPath,
+            'pas_foto'          => $pasFotoPath,
         ]);
 
-        return redirect()->route('admin.anggota.index')->with('success', 'Anggota berhasil ditambahkan!');
+        return redirect()->route('admin.anggota.index')->with('success', 'Anggota baru berhasil ditambahkan!');
     }
 
     /**
@@ -147,7 +145,7 @@ class AnggotaController extends Controller
     }
 
     /**
-     * Update Data Anggota
+     * Update Data Anggota (Bisa Edit No KTA Juga)
      */
     public function update(Request $request, $id)
     {
@@ -158,6 +156,7 @@ class AnggotaController extends Controller
             'name'           => 'required|string|max:255',
             'email'          => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'nik'            => 'required|string|size:16|unique:anggotas,nik,' . $anggota->id,
+            'no_kta'         => 'required|string|max:50|unique:anggotas,no_kta,' . $anggota->id, // FIX: Validasi Update No KTA
             'tempat_lahir'   => 'required|string|max:100',
             'tanggal_lahir'  => 'required|date',
             'jenis_kelamin'  => 'required|in:L,P',
@@ -172,7 +171,7 @@ class AnggotaController extends Controller
         $userData = [
             'name'         => $request->name,
             'email'        => $request->email,
-            'kabupaten_id' => $request->kabupaten_id, // FIX: update kabupaten_id di tabel users
+            'kabupaten_id' => $request->kabupaten_id,
         ];
 
         if ($request->filled('password')) {
@@ -185,18 +184,17 @@ class AnggotaController extends Controller
         $pasFotoPath = $anggota->pas_foto;
 
         if ($request->hasFile('pas_foto')) {
-            // Hapus foto lama jika ada
             if ($anggota->pas_foto && Storage::disk('public')->exists($anggota->pas_foto)) {
                 Storage::disk('public')->delete($anggota->pas_foto);
             }
             
-            // Simpan foto baru (cropped & compressed)
             $pasFotoPath = $this->cropAndCompressImage($request->file('pas_foto'), 'pas_foto');
         }
 
         // 3. Update Data Anggota
         $anggota->update([
             'nik'           => $request->nik,
+            'no_kta'        => $request->no_kta, // FIX: simpan perbaikan No. KTA
             'tempat_lahir'  => $request->tempat_lahir,
             'tanggal_lahir' => $request->tanggal_lahir,
             'jenis_kelamin' => $request->jenis_kelamin,
@@ -236,9 +234,9 @@ class AnggotaController extends Controller
      */
     private function cropAndCompressImage($file, $folder)
     {
-        $targetWidth  = 600;  // Lebar standar pas foto HD
-        $targetHeight = 800;  // Tinggi rasio 3:4
-        $quality      = 75;   // Kompresi JPG
+        $targetWidth  = 600;  
+        $targetHeight = 800;  
+        $quality      = 75;   
 
         $filename = uniqid() . '_' . time() . '.jpg';
         $destinationPath = storage_path('app/public/' . $folder);
@@ -250,15 +248,12 @@ class AnggotaController extends Controller
         $fullPath = $destinationPath . '/' . $filename;
         $realPath = $file->getRealPath();
 
-        // 1. Ambil info gambar
         list($origWidth, $origHeight, $type) = getimagesize($realPath);
 
-        // Load Resource Gambar
         switch ($type) {
             case IMAGETYPE_JPEG:
                 $sourceImage = imagecreatefromjpeg($realPath);
                 
-                // 2. BACA DATA EXIF DAN FIX ORIENTASI (KHUSUS JPG/JPEG)
                 if (function_exists('exif_read_data')) {
                     @$exif = exif_read_data($realPath);
                     if (!empty($exif['Orientation'])) {
@@ -266,14 +261,12 @@ class AnggotaController extends Controller
                             case 3:
                                 $sourceImage = imagerotate($sourceImage, 180, 0);
                                 break;
-                            case 6: // Rotasi 90 derajat searah jarum jam (paling sering di HP)
+                            case 6:
                                 $sourceImage = imagerotate($sourceImage, -90, 0);
-                                // Swap dimensi karena gambar diputar 90 derajat
                                 list($origWidth, $origHeight) = [$origHeight, $origWidth];
                                 break;
-                            case 8: // Rotasi 90 derajat berlawanan jarum jam
+                            case 8:
                                 $sourceImage = imagerotate($sourceImage, 90, 0);
-                                // Swap dimensi
                                 list($origWidth, $origHeight) = [$origHeight, $origWidth];
                                 break;
                         }
@@ -289,7 +282,6 @@ class AnggotaController extends Controller
                 return $file->store($folder, 'public');
         }
 
-        // 3. Kalkulasi Center-Crop (Rasio 3:4)
         $targetRatio = $targetWidth / $targetHeight;
         $sourceRatio = $origWidth / $origHeight;
 
@@ -305,20 +297,16 @@ class AnggotaController extends Controller
             $srcY       = (int)(($origHeight - $cropHeight) / 2);
         }
 
-        // 4. Buat Canvas Baru ukuran 600x800
         $canvas = imagecreatetruecolor($targetWidth, $targetHeight);
 
-        // Resize & Crop dari Source ke Canvas
         imagecopyresampled(
             $canvas, $sourceImage,
             0, 0, $srcX, $srcY,
             $targetWidth, $targetHeight, $cropWidth, $cropHeight
         );
 
-        // 5. Simpan sebagai JPG Terkompresi
         imagejpeg($canvas, $fullPath, $quality);
 
-        // Clean Up Memory
         imagedestroy($sourceImage);
         imagedestroy($canvas);
 

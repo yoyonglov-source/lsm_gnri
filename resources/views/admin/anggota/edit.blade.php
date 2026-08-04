@@ -51,6 +51,7 @@
                                 @enderror
                             </div>
                         </div>
+
                         <!-- Status Aktif / Non-Aktif -->
                         <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200 mt-4">
                             <div>
@@ -74,10 +75,19 @@
                             <!-- Nama Lengkap -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
-                                <input type="text" name="name" 
-                                    value="{{ old('name', optional($anggota->user)->name) }}" required
-                                    class="w-full text-sm rounded-xl border-slate-300 focus:border-emerald-500 focus:ring-emerald-500">
+                                <input type="text" name="name" value="{{ old('name', optional($anggota->user)->name) }}" required
+                                       class="w-full text-sm rounded-xl border-slate-300 focus:border-emerald-500 focus:ring-emerald-500 @error('name') border-red-500 @enderror">
                                 @error('name')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Nomor KTA (INPUT MANUAL) -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nomor KTA <span class="text-red-500">*</span></label>
+                                <input type="text" name="no_kta" value="{{ old('no_kta', $anggota->no_kta) }}" required
+                                       class="w-full text-sm rounded-xl border-slate-300 focus:border-emerald-500 focus:ring-emerald-500 @error('no_kta') border-red-500 @enderror">
+                                @error('no_kta')
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -105,7 +115,7 @@
                             <!-- Tanggal Lahir -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Tanggal Lahir <span class="text-red-500">*</span></label>
-                                <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', \Carbon\Carbon::parse($anggota->tanggal_lahir)->format('Y-m-d')) }}" required
+                                <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $anggota->tanggal_lahir) }}" required
                                        class="w-full text-sm rounded-xl border-slate-300 focus:border-emerald-500 focus:ring-emerald-500 @error('tanggal_lahir') border-red-500 @enderror">
                                 @error('tanggal_lahir')
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -154,9 +164,8 @@
                             <!-- Jabatan -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Jabatan dalam Organisasi</label>
-                                <input type="text" name="jabatan" 
-                                    value="{{ old('jabatan', $anggota->jabatan) }}"
-                                    class="w-full text-sm rounded-xl border-slate-300 focus:border-emerald-500 focus:ring-emerald-500">
+                                <input type="text" name="jabatan" value="{{ old('jabatan', $anggota->jabatan) }}"
+                                       class="w-full text-sm rounded-xl border-slate-300 focus:border-emerald-500 focus:ring-emerald-500">
                             </div>
 
                             <!-- Alamat Lengkap -->
@@ -177,30 +186,35 @@
                             3. Pas Foto Resmi
                         </h3>
                         <div class="flex flex-col sm:flex-row items-center gap-6">
-                            <!-- Preview Box -->
                             <div class="w-32 h-40 bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl overflow-hidden flex flex-col items-center justify-center flex-shrink-0 relative group">
-                                <img id="foto-preview" 
-                                     src="{{ $anggota->pas_foto ? asset('storage/' . $anggota->pas_foto) : '' }}" 
-                                     class="w-full h-full object-cover {{ $anggota->pas_foto ? '' : 'hidden' }}">
-                                
-                                <div id="placeholder-icon" class="text-center p-2 {{ $anggota->pas_foto ? 'hidden' : '' }}">
-                                    <svg class="w-8 h-8 text-slate-400 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                    </svg>
-                                    <span class="text-[10px] text-slate-400 font-medium">Preview Foto</span>
-                                </div>
+                                @if($anggota->pas_foto)
+                                    <img id="foto-preview" src="{{ asset('storage/' . $anggota->pas_foto) }}" class="w-full h-full object-cover">
+                                    <div id="placeholder-icon" class="text-center p-2 hidden">
+                                        <svg class="w-8 h-8 text-slate-400 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        <span class="text-[10px] text-slate-400 font-medium">Preview Foto</span>
+                                    </div>
+                                @else
+                                    <img id="foto-preview" class="w-full h-full object-cover hidden">
+                                    <div id="placeholder-icon" class="text-center p-2">
+                                        <svg class="w-8 h-8 text-slate-400 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        <span class="text-[10px] text-slate-400 font-medium">Preview Foto</span>
+                                    </div>
+                                @endif
                             </div>
 
-                            <!-- Upload Button -->
                             <div class="flex-1 w-full">
                                 <input type="file" name="pas_foto" id="pas_foto" accept="image/*" onchange="previewImage(event)" class="hidden">
                                 <label for="pas_foto" class="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs rounded-xl cursor-pointer transition">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
                                     </svg>
-                                    Ubah Foto
+                                    Ganti Foto Berkas
                                 </label>
-                                <p class="text-[11px] text-slate-500 mt-2">Biarkan kosong jika tidak ingin mengganti pas foto.</p>
+                                <p class="text-[11px] text-slate-500 mt-2">Kosongkan jika tidak ingin mengubah foto.</p>
                                 @error('pas_foto')
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
@@ -231,7 +245,7 @@
                 const placeholder = document.getElementById('placeholder-icon');
                 output.src = reader.result;
                 output.classList.remove('hidden');
-                placeholder.classList.add('hidden');
+                if (placeholder) placeholder.classList.add('hidden');
             };
             if(event.target.files[0]) {
                 reader.readAsDataURL(event.target.files[0]);

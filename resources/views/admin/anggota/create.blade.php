@@ -70,6 +70,17 @@
                                 @enderror
                             </div>
 
+                            <!-- Nomor KTA (INPUT MANUAL) -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nomor KTA <span class="text-red-500">*</span></label>
+                                <input type="text" name="no_kta" value="{{ old('no_kta') }}" required
+                                       class="w-full text-sm rounded-xl border-slate-300 focus:border-emerald-500 focus:ring-emerald-500 @error('no_kta') border-red-500 @enderror"
+                                       placeholder="Contoh: GNRI.2026.0001">
+                                @error('no_kta')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
                             <!-- NIK -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase mb-1">NIK (16 Digit) <span class="text-red-500">*</span></label>
@@ -171,7 +182,6 @@
                             3. Pas Foto Resmi
                         </h3>
                         <div class="flex flex-col sm:flex-row items-center gap-6">
-                            <!-- Preview Box -->
                             <div class="w-32 h-40 bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl overflow-hidden flex flex-col items-center justify-center flex-shrink-0 relative group">
                                 <img id="foto-preview" class="w-full h-full object-cover hidden">
                                 <div id="placeholder-icon" class="text-center p-2">
@@ -182,7 +192,6 @@
                                 </div>
                             </div>
 
-                            <!-- Upload Button -->
                             <div class="flex-1 w-full">
                                 <input type="file" name="pas_foto" id="pas_foto" accept="image/*" onchange="previewImage(event)" class="hidden">
                                 <label for="pas_foto" class="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs rounded-xl cursor-pointer transition">
@@ -191,7 +200,7 @@
                                     </svg>
                                     Pilih Foto Berkas
                                 </label>
-                                <p class="text-[11px] text-slate-500 mt-2">Format: JPG, JPEG, PNG. Ukuran maksimal 2MB. Disarankan rasio 3x4 / portrait.</p>
+                                <p class="text-[11px] text-slate-500 mt-2">Format: JPG, JPEG, PNG. Ukuran maksimal 10MB. Disarankan rasio 3x4 / portrait.</p>
                                 @error('pas_foto')
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror

@@ -10,40 +10,44 @@
                     </a>
                 </div>
 
-                <!-- Navigation Links (Desktop) -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    
-                    {{-- 1. MENU UNTUK ADMIN (Statistik Admin sebagai Utama) --}}
-                    @if(in_array(strtolower(auth()->user()->role), ['admin', 'superadmin', 'admin_dpw', 'admin_dpd']))
-                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
-                            {{ __('Dashboard') }}
-                        </x-nav-link>
-
-                        <x-nav-link :href="route('admin.anggota.index')" :active="request()->routeIs('admin.anggota.*')">
-                            {{ __('Data Anggota') }}
-                        </x-nav-link>
-
-                        <x-nav-link :href="route('admin.verifikasi.index')" :active="request()->routeIs('admin.verifikasi.*')">
-                            {{ __('Verifikasi Anggota') }}
-                        </x-nav-link>
-
-                        <x-nav-link :href="route('admin.kabupaten.index')" :active="request()->routeIs('admin.kabupaten.*')">
-                            {{ __('Data Kabupaten') }}
-                        </x-nav-link>
-
-                    {{-- 2. MENU UNTUK USER BIASA / ANGGOTA --}}
-                    @else
-                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                            {{ __('Dashboard') }}
-                        </x-nav-link>
-                    @endif
-
-                    {{-- 3. MENU PROFILE ANGGOTA (Dapat diakses semua pengguna) --}}
-                    <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
-                        {{ __('Profile Saya') }}
+               <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+    
+                {{-- 1. MENU UNTUK ADMIN (Statistik Admin sebagai Utama) --}}
+                @if(in_array(strtolower(auth()->user()->role), ['admin', 'superadmin', 'admin_dpw', 'admin_dpd']))
+                    <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                        {{ __('Dashboard') }}
                     </x-nav-link>
 
-                </div>
+                    <x-nav-link :href="route('admin.anggota.index')" :active="request()->routeIs('admin.anggota.*')">
+                        {{ __('Data Anggota') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('admin.verifikasi.index')" :active="request()->routeIs('admin.verifikasi.*')">
+                        {{ __('Verifikasi Anggota') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('admin.kabupaten.index')" :active="request()->routeIs('admin.kabupaten.*')">
+                        {{ __('Data Kabupaten') }}
+                    </x-nav-link>
+
+                    {{-- TAMBAHKAN MENU BERITA DI SINI UNTUK DESKTOP --}}
+                    <x-nav-link :href="route('admin.berita.index')" :active="request()->routeIs('admin.berita.*')">
+                        {{ __('Berita & Kegiatan') }}
+                    </x-nav-link>
+
+                {{-- 2. MENU UNTUK USER BIASA / ANGGOTA --}}
+                @else
+                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                        {{ __('Dashboard') }}
+                    </x-nav-link>
+                @endif
+
+                {{-- 3. MENU PROFILE ANGGOTA (Dapat diakses semua pengguna) --}}
+                <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
+                    {{ __('Profile Saya') }}
+                </x-nav-link>
+
+            </div>
             </div>
 
             <!-- Settings Dropdown -->
@@ -112,6 +116,12 @@
                 <x-responsive-nav-link :href="route('admin.kabupaten.index')" :active="request()->routeIs('admin.kabupaten.*')">
                     {{ __('Data Kabupaten') }}
                 </x-responsive-nav-link>
+
+                <!-- MENU BERITA & KEGIATAN BARU -->
+                <x-responsive-nav-link :href="route('admin.berita.index')" :active="request()->routeIs('admin.berita.*')">
+                    {{ __('Berita & Kegiatan') }}
+                </x-responsive-nav-link>
+                
             @else
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                     {{ __('Dashboard') }}
