@@ -43,7 +43,7 @@
 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Isi Berita / Konten</label>
-                    <textarea name="konten" rows="10" required class="w-full text-sm rounded-xl border-slate-300 focus:border-emerald-500 focus:ring-emerald-500">{{ old('konten', $berita->konten) }}</textarea>
+                    <textarea name="konten" id="editor" rows="10">{{ old('konten', $berita->konten) }}</textarea>
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
@@ -56,3 +56,14 @@
         </div>
     </div>
 </x-app-layout>
+
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+<script>
+    ClassicEditor
+        .create(document.querySelector('#editor'), {
+            toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'undo', 'redo']
+        })
+        .catch(error => {
+            console.error(error);
+        });
+</script>

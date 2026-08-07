@@ -30,6 +30,7 @@ Route::get('/cek-keanggotaan', [KtaVerificationController::class, 'search'])->na
 Route::get('/verify-kta/{no_kta}', [KtaVerificationController::class, 'verify'])->name('kta.verify');
 Route::get('/berita', [BeritaPublicController::class, 'index'])->name('berita.index');
 Route::get('/berita/{slug}', [BeritaPublicController::class, 'show'])->name('berita.show');
+Route::get('/', [BeritaPublicController::class, 'welcome'])->name('home');
 
 // 2. RUTE KHUSUS USER UMUM / ANGGOTA BIASA (Sudah Login)
 Route::middleware(['auth', 'verified', 'role:user,anggota,admin,superadmin,admin_dpw,admin_dpd'])->group(function () {

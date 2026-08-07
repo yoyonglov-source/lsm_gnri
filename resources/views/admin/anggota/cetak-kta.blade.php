@@ -128,18 +128,18 @@
                 @endphp
 
                 <!-- Teks Jabatan Spesifik / Anggota -->
-                <p class="text-[10px] font-black text-red-600 uppercase tracking-tight leading-tight">
+                <p class="text-[12px] font-black text-red-600 uppercase tracking-tight leading-tight">
                     {{ $jabatanRaw }}
                 </p>
 
                 @if($isDPW)
                     <!-- Tampilan jika pilih DPW Riau -->
-                    <p class="text-[9px] font-black text-red-600 uppercase tracking-tight leading-tight">
+                    <p class="text-[11px] font-black text-red-600 uppercase tracking-tight leading-tight">
                         DEWAN PIMPINAN WILAYAH RIAU
                     </p>
                 @else
                     <!-- Tampilan jika pilih Kabupaten / Kota (DPD) -->
-                    <p class="text-[9px] font-black text-red-600 uppercase tracking-tight leading-tight">
+                    <p class="text-[11px] font-black text-red-600 uppercase tracking-tight leading-tight">
                         DEWAN PIMPINAN DAERAH {{ $namaWilayah }}
                     </p>
                 @endif

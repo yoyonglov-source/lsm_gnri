@@ -7,6 +7,15 @@ use Illuminate\Http\Request;
 
 class BeritaPublicController extends Controller
 {
+    // Method untuk Halaman Utama / Landing Page (Welcome)
+    public function welcome()
+    {
+        // Ambil 3 berita terbaru dari database
+        $beritaTerbaru = Berita::latest()->take(3)->get();
+
+        return view('welcome', compact('beritaTerbaru'));
+    }
+
     public function index()
     {
         // 1. Ambil 1 Berita Headline Terbaru
